@@ -10,10 +10,11 @@
         public int UserRoleId { get; set; }
         public UserRole UserRole { get; set; }
 
-        public void CreatePassword(string password)
+        public string CreatePassword(string password)
         {
             string pass = BCrypt.Net.BCrypt.EnhancedHashPassword(password, workFactor: 13);
             Password = pass;
+            return Password;
         }
         public bool VerifyPassword(string password)
         {

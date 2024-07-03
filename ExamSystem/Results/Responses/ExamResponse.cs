@@ -1,7 +1,8 @@
 ﻿namespace ExamSystem.Results.Responses
 {
-    public class UpdateResponse
+    public class ExamResponse
     {
         public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

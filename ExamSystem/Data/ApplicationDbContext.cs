@@ -11,6 +11,7 @@ namespace ExamSystem.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Exam> Exams { get; set; }  
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
