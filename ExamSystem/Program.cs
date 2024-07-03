@@ -53,6 +53,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+
 
 var app = builder.Build();
 

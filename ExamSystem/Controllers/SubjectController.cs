@@ -17,6 +17,7 @@ namespace ExamSystem.Controllers
             _subjectService = subjectService;
         }
 
+        [HttpPost("add")]
         public async Task<ApiResult<SubjectResponse>> AddSubject(SubjectRequest request) => await _subjectService.AddSubject(request);
 
         // deployment branch yarat arada bir mastere merge ele
