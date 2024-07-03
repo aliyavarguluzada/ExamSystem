@@ -54,7 +54,7 @@ namespace ExamSystem.Services
                              .Subjects
                              .Select(c => new SubjectDto
                              {
-                                 Name = c.Name,
+                                 Name = c.Name
 
                              })
                              .Skip((model.PageNumber - 1) * model.PageSize)
