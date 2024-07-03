@@ -5,6 +5,7 @@ using ExamSystem.Models;
 using ExamSystem.Results;
 using ExamSystem.Results.Requests;
 using ExamSystem.Results.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExamSystem.Services
 {
@@ -47,9 +48,20 @@ namespace ExamSystem.Services
 
         }
 
-        public Task<List<SubjectDto>> GetAllSubjects(PaginationModel model)
+        public async Task<List<SubjectDto>> GetAllSubjects(PaginationModel model)
         {
-            throw new NotImplementedException();
+            var subjects = await _context
+                             .Subjects
+                             .Select(c => new SubjectDto
+                             {
+                                 Name = c.Name,
+
+                             })
+                             .Skip((model.PageNumber - 1) * model.PageSize)
+                             .Take(model.PageSize)
+                             .ToListAsync();
+
+            return subjects;
         }
     }
 }
