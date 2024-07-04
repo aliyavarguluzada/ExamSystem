@@ -3,6 +3,7 @@ using ExamSystem.Results.Requests;
 using ExamSystem.Results.Responses;
 using ExamSystem.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExamSystem.Controllers
 {
@@ -19,5 +20,7 @@ namespace ExamSystem.Controllers
 
         [HttpPost("add")]
         public async Task<ApiResult<ExamResponse>> AddExam(ExamRequest request) => await _examService.AddExam(request);
+  
+        
     }
 }

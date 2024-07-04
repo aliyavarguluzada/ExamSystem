@@ -20,6 +20,11 @@ namespace ExamSystem.Controllers
         [HttpPost("add")]
         public async Task<ApiResult<SubjectResponse>> AddSubject(SubjectRequest request) => await _subjectService.AddSubject(request);
 
-        // deployment branch yarat arada bir mastere merge ele
+        [HttpPut("update/{id}")]
+        public async Task<ApiResult<SubjectResponse>> Update([FromRoute] int id, [FromBody] SubjectRequest request) => await _subjectService.Update(id, request);
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<ApiResult<SubjectResponse>> Deactivate([FromRoute] int id) => await _subjectService.Deactivate(id);
+
     }
 }

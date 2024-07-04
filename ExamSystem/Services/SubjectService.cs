@@ -33,6 +33,7 @@ namespace ExamSystem.Services
                 Name = request.Name,
                 CreateDate = DateTime.Now,
                 EditDate = DateTime.Now,
+                IsActive = true
             };
 
             await _context.Subjects.AddAsync(subject);
@@ -47,7 +48,6 @@ namespace ExamSystem.Services
 
 
         }
-
         public async Task<List<SubjectDto>> GetAllSubjects(PaginationModel model)
         {
             var subjects = await _context
@@ -62,6 +62,48 @@ namespace ExamSystem.Services
                              .ToListAsync();
 
             return subjects;
+        }
+        public async Task<ApiResult<SubjectResponse>> Update(int id, SubjectRequest request)
+        {
+            var subject = await _context
+                                .Subjects
+                                .Where(c => c.Id == id)
+                                .FirstAsync();
+
+            subject.Name = request.Name;
+
+            _context.Update(subject);
+
+            await _context.SaveChangesAsync();
+
+            var response = new SubjectResponse
+            {
+                Name = request.Name,
+                Description = request.Description
+
+            };
+
+            return ApiResult<SubjectResponse>.Ok(response);
+
+        }
+        public async Task<ApiResult<SubjectResponse>> Deactivate(int id)
+        {
+            var subject = await _context
+                                .Subjects
+                                .Where(c => c.Id == id)
+                                .FirstAsync();
+
+            subject.IsActive = false;
+
+            _context.Update(subject);
+            await _context.SaveChangesAsync();
+
+            var response = new SubjectResponse
+            {
+                Name = subject.Name
+            };
+
+            return ApiResult<SubjectResponse>.Ok(response);
         }
     }
 }

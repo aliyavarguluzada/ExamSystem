@@ -26,7 +26,7 @@ namespace ExamSystem.Controllers
         [HttpPost("addRole")]
         public async Task<ApiResult<UserResponse>> AddUserRole([FromBody] string name) => await _userService.AddUserRole(name);
 
-        [HttpPut("update"), Authorize(Roles = "Admin")]
+        [HttpPut("update/{id}"), Authorize(Roles = "Admin")]
         public async Task<ApiResult<UpdateResponse>> Update([FromRoute] int id, [FromBody] UpdateRequest request) => await _userService.Update(id, request);
 
         [HttpPut("deactivate"), Authorize(Roles = "Admin")]
