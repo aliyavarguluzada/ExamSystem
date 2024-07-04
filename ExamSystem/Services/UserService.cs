@@ -1,5 +1,6 @@
 ﻿using ExamSystem.Data;
 using ExamSystem.Dtos;
+using ExamSystem.Entities;
 using ExamSystem.Models;
 using ExamSystem.Results;
 using ExamSystem.Results.Requests;
@@ -81,8 +82,29 @@ namespace ExamSystem.Services
             return ApiResult<UserResponse>.Ok(response);
         }
 
+        public async Task<ApiResult<UserResponse>> AddUserRole(string name)
+        {
+            var newRole = new UserRole
+            {
+                CreateDate = DateTime.Now,
+                EditDate = DateTime.Now,
+                Name = name
+            };
 
-       
+            await _context.AddAsync(newRole);
+            await _context.SaveChangesAsync();
+
+            var response = new UserResponse
+            {
+                Name = name,
+                Description = "New Role Created"
+            };
+
+            return ApiResult<UserResponse>.Ok(response);
+        }
+
+
+
     }
 
 }

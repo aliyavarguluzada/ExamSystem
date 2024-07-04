@@ -29,6 +29,10 @@ namespace ExamSystem.Controllers
         [HttpPut("deactivate"), Authorize(Roles = "Admin")]
         public async Task<ApiResult<UserResponse>> Deactive(int id) => await _userService.Deactive(id);
 
+        [HttpPut("addRole"), Authorize(Roles = "Admin")]
+        public async Task<ApiResult<UserResponse>> AddUserRole(string name) => await _userService.AddUserRole(name);
+
+
 
 
     }

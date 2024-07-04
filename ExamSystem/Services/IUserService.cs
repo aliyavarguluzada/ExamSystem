@@ -12,6 +12,7 @@ namespace ExamSystem.Services
         public Task<ApiResult<UpdateResponse>> Update(int id, UpdateRequest request);
 
         public Task<ApiResult<UserResponse>> Deactive(int id);
+        public Task<ApiResult<UserResponse>> AddUserRole(string name);
 
     }
 }

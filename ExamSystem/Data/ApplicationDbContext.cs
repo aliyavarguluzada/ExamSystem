@@ -13,11 +13,6 @@ namespace ExamSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Admin>()
-            //    .Has
-            //            //.HasRequired(c => c.Stage)
-                        //.WithMany()
-                        //.WillCascadeOnDelete(false);
 
             base.OnModelCreating(modelBuilder);
         }
