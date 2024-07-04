@@ -22,42 +22,6 @@ namespace ExamSystem.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ExamSystem.Entities.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EditDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserRoleId");
-
-                    b.ToTable("Admins");
-                });
-
             modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
                 {
                     b.Property<int>("Id")
@@ -157,14 +121,9 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExamId");
-
-                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Students");
                 });
@@ -221,12 +180,7 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Teachers");
                 });
@@ -293,17 +247,6 @@ namespace ExamSystem.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("ExamSystem.Entities.Admin", b =>
-                {
-                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
-                        .WithMany("Admins")
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRole");
-                });
-
             modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
                 {
                     b.HasOne("ExamSystem.Entities.Subject", "Subject")
@@ -339,25 +282,6 @@ namespace ExamSystem.Migrations
                     b.HasOne("ExamSystem.Entities.Exam", null)
                         .WithMany("Students")
                         .HasForeignKey("ExamId");
-
-                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
-                        .WithMany("Students")
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("ExamSystem.Entities.Teacher", b =>
-                {
-                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
-                        .WithMany("Teachers")
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.User", b =>
@@ -385,12 +309,6 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.UserRole", b =>
                 {
-                    b.Navigation("Admins");
-
-                    b.Navigation("Students");
-
-                    b.Navigation("Teachers");
-
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

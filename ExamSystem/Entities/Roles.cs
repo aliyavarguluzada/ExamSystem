@@ -1,6 +1,6 @@
 ﻿namespace ExamSystem.Entities
 {
-    public class Roles
+    public class Roles : BaseEntity
     {
     }
 }

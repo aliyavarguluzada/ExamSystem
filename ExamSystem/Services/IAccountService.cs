@@ -7,9 +7,6 @@ namespace ExamSystem.Services
 {
     public interface IAccountService
     {
-        public Task<ApiResult<UserResponse>> AdminRegister(RegisterRequest request);
-        public Task<ApiResult<UserResponse>> TeacherRegister(RegisterRequest request);
-        public Task<ApiResult<UserResponse>> StudentRegister(RegisterRequest request);
         public Task<ApiResult<UserResponse>> Login(LoginRequest request);
     }
 }
