@@ -20,31 +20,46 @@ namespace ExamSystem.Services
 
         public async Task<ApiResult<SubjectResponse>> AddSubject(SubjectRequest request)
         {
-            var checkSubject = _context
-                .Subjects
-                .Where(c => c.Name == request.Name)
-                .Any();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (checkSubject)
-                return ApiResult<SubjectResponse>.Error($"{checkSubject}", "Exists");
-
-            var subject = new Subject
+            try
             {
-                Name = request.Name,
-                CreateDate = DateTime.Now,
-                EditDate = DateTime.Now,
-                IsActive = true
-            };
+                var checkSubject = _context
+                    .Subjects
+                    .Where(c => c.Name == request.Name)
+                    .Any();
 
-            await _context.Subjects.AddAsync(subject);
-            await _context.SaveChangesAsync();
+                if (String.IsNullOrEmpty(request.Name))
+                    return ApiResult<SubjectResponse>.Error("", "Enter a name for Subject");
 
-            var response = new SubjectResponse
+                if (checkSubject)
+                    return ApiResult<SubjectResponse>.Error($"{checkSubject}", "Exists");
+
+                var subject = new Subject
+                {
+                    Name = request.Name,
+                    CreateDate = DateTime.Now,
+                    EditDate = DateTime.Now,
+                    IsActive = true
+                };
+
+                await _context.Subjects.AddAsync(subject);
+                await transaction.CommitAsync();
+                await _context.SaveChangesAsync();
+
+                var response = new SubjectResponse
+                {
+                    Name = subject.Name
+                };
+
+                return ApiResult<SubjectResponse>.Ok(response);
+            }
+            catch (Exception)
             {
-                Name = subject.Name
-            };
+                await transaction.RollbackAsync();
 
-            return ApiResult<SubjectResponse>.Ok(response);
+                return ApiResult<SubjectResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
 
 
         }
@@ -65,45 +80,70 @@ namespace ExamSystem.Services
         }
         public async Task<ApiResult<SubjectResponse>> Update(int id, SubjectRequest request)
         {
-            var subject = await _context
-                                .Subjects
-                                .Where(c => c.Id == id)
-                                .FirstAsync();
-
-            subject.Name = request.Name;
-
-            _context.Update(subject);
-
-            await _context.SaveChangesAsync();
-
-            var response = new SubjectResponse
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Name = request.Name,
-                Description = request.Description
+                var subject = await _context
+                                    .Subjects
+                                    .Where(c => c.Id == id)
+                                    .FirstAsync();
 
-            };
+                if (id == null || id == 0)
+                    return ApiResult<SubjectResponse>.Error("", "Id is null or 0", StatusCodes.Status406NotAcceptable);
 
-            return ApiResult<SubjectResponse>.Ok(response);
 
+                subject.Name = request.Name;
+
+                _context.Update(subject);
+                await transaction.CommitAsync();
+                await _context.SaveChangesAsync();
+
+                var response = new SubjectResponse
+                {
+                    Name = request.Name,
+                    Description = request.Description
+
+                };
+
+                return ApiResult<SubjectResponse>.Ok(response);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+
+                return ApiResult<SubjectResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
         }
         public async Task<ApiResult<SubjectResponse>> Deactivate(int id)
         {
-            var subject = await _context
-                                .Subjects
-                                .Where(c => c.Id == id)
-                                .FirstAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            subject.IsActive = false;
-
-            _context.Update(subject);
-            await _context.SaveChangesAsync();
-
-            var response = new SubjectResponse
+            try
             {
-                Name = subject.Name
-            };
+                var subject = await _context
+                                    .Subjects
+                                    .Where(c => c.Id == id)
+                                    .FirstAsync();
 
-            return ApiResult<SubjectResponse>.Ok(response);
+                subject.IsActive = false;
+
+                _context.Update(subject);
+                await _context.SaveChangesAsync();
+
+                var response = new SubjectResponse
+                {
+                    Name = subject.Name
+                };
+
+                return ApiResult<SubjectResponse>.Ok(response);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+
+                return ApiResult<SubjectResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
         }
     }
 }
+
