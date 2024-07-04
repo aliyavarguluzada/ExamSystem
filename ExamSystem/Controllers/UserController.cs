@@ -27,10 +27,10 @@ namespace ExamSystem.Controllers
         public async Task<ApiResult<UserResponse>> AddUserRole([FromBody] string name) => await _userService.AddUserRole(name);
 
         [HttpPut("update"), Authorize(Roles = "Admin")]
-        public async Task<ApiResult<UpdateResponse>> Update(int id, UpdateRequest request) => await _userService.Update(id, request);
+        public async Task<ApiResult<UpdateResponse>> Update([FromRoute] int id, [FromBody] UpdateRequest request) => await _userService.Update(id, request);
 
         [HttpPut("deactivate"), Authorize(Roles = "Admin")]
-        public async Task<ApiResult<UserResponse>> Deactive(int id) => await _userService.Deactive(id);
+        public async Task<ApiResult<UserResponse>> Deactive([FromBody] int id) => await _userService.Deactive(id);
 
 
 
