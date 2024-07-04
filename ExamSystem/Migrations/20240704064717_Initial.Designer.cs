@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240703130036_Changed RegisterDate to CreateDate")]
-    partial class ChangedRegisterDatetoCreateDate
+    [Migration("20240704064717_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,14 +39,61 @@ namespace ExamSystem.Migrations
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EditDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("Exams");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Mark", b =>
@@ -63,10 +110,10 @@ namespace ExamSystem.Migrations
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("ExamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubjectId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
                     b.Property<int>("Value")
@@ -74,9 +121,9 @@ namespace ExamSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("ExamId");
 
-                    b.HasIndex("SubjectId");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Marks");
                 });
@@ -99,6 +146,9 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ExamId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -107,12 +157,14 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ExamId");
+
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Students");
                 });
@@ -162,12 +214,16 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Teachers");
                 });
@@ -236,54 +292,65 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.Admin", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Admins")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("ExamSystem.Entities.Mark", b =>
+            modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.Student", "Student")
-                        .WithMany("Marks")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ExamSystem.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Student");
-
                     b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("ExamSystem.Entities.Mark", b =>
+                {
+                    b.HasOne("ExamSystem.Entities.Exam", null)
+                        .WithMany("Marks")
+                        .HasForeignKey("ExamId");
+
+                    b.HasOne("ExamSystem.Entities.Student", "Student")
+                        .WithMany("Marks")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Student", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.Exam", null)
+                        .WithMany("Students")
+                        .HasForeignKey("ExamId");
+
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Students")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Teacher", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Teachers")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.User", b =>
@@ -297,6 +364,13 @@ namespace ExamSystem.Migrations
                     b.Navigation("UserRole");
                 });
 
+            modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
+                {
+                    b.Navigation("Marks");
+
+                    b.Navigation("Students");
+                });
+
             modelBuilder.Entity("ExamSystem.Entities.Student", b =>
                 {
                     b.Navigation("Marks");
@@ -304,6 +378,12 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.UserRole", b =>
                 {
+                    b.Navigation("Admins");
+
+                    b.Navigation("Students");
+
+                    b.Navigation("Teachers");
+
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

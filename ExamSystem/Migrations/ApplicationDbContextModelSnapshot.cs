@@ -36,12 +36,24 @@ namespace ExamSystem.Migrations
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Admins");
                 });
@@ -101,9 +113,6 @@ namespace ExamSystem.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
@@ -112,8 +121,6 @@ namespace ExamSystem.Migrations
                     b.HasIndex("ExamId");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("SubjectId");
 
                     b.ToTable("Marks");
                 });
@@ -147,14 +154,14 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ExamId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Students");
                 });
@@ -204,12 +211,16 @@ namespace ExamSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Teachers");
                 });
@@ -278,13 +289,13 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.Admin", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Admins")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Exam", b =>
@@ -310,15 +321,7 @@ namespace ExamSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExamSystem.Entities.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Student");
-
-                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Student", b =>
@@ -327,24 +330,24 @@ namespace ExamSystem.Migrations
                         .WithMany("Students")
                         .HasForeignKey("ExamId");
 
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Students")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.Teacher", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("ExamSystem.Entities.UserRole", "UserRole")
+                        .WithMany("Teachers")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("ExamSystem.Entities.User", b =>
@@ -372,6 +375,12 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.UserRole", b =>
                 {
+                    b.Navigation("Admins");
+
+                    b.Navigation("Students");
+
+                    b.Navigation("Teachers");
+
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

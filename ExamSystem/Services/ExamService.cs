@@ -25,13 +25,17 @@ namespace ExamSystem.Services
                 Description = request.Description,
                 CreateDate = DateTime.Now,
                 EditDate = DateTime.Now,
-                SubjectId = request.SubjectId,
+                SubjectId = request.SubjectId
             };
 
             await _context.Exams.AddAsync(newExam);
             await _context.SaveChangesAsync();
 
-            return ApiResult<ExamResponse>.Ok(new ExamResponse());
+            return ApiResult<ExamResponse>.Ok(new ExamResponse
+            {
+                Name = request.Name,
+                Description = request.Description
+            });
         }
 
     }

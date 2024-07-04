@@ -89,13 +89,26 @@ namespace ExamSystem.Services
                 UserRoleId = (int)UserRoleEnum.Student,
                 isActive = true,
                 EditDate = DateTime.Now,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.Now,
+                
+
+            };
+            var newStudent = new Student
+            {
+                CreateDate = DateTime.Now,
+                EditDate =  DateTime.Now,
+                Email = request.Email,
+                Name = request.Name,
+                UserRoleId= (int)UserRoleEnum.Student
 
             };
 
             newUser.CreatePassword(request.Password);
+            newStudent.Password = newUser.Password;
+
 
             await _context.Users.AddAsync(newUser);
+            await _context.Students.AddAsync(newStudent);
 
             await _context.SaveChangesAsync();
             return newUser;
