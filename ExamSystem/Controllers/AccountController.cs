@@ -22,7 +22,6 @@ namespace ExamSystem.Controllers
         [HttpPost("teacherRegister")]
         public async Task<ApiResult<UserResponse>> TeacherRegister(RegisterRequest request) => await _accountService.TeacherRegister(request);
 
-
         [HttpPost("login")]
         public async Task<ApiResult<UserResponse>> Login(LoginRequest request) => await _accountService.Login(request);
     }
