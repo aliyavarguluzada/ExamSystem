@@ -83,14 +83,13 @@ namespace ExamSystem.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                if (id == null || id == 0)
+                    return ApiResult<SubjectResponse>.Error("", "Id is null or 0", StatusCodes.Status406NotAcceptable);
+
                 var subject = await _context
                                     .Subjects
                                     .Where(c => c.Id == id)
                                     .FirstAsync();
-
-                if (id == null || id == 0)
-                    return ApiResult<SubjectResponse>.Error("", "Id is null or 0", StatusCodes.Status406NotAcceptable);
-
 
                 subject.Name = request.Name;
 
@@ -120,6 +119,9 @@ namespace ExamSystem.Services
 
             try
             {
+                if (id == null || id == 0)
+                    return ApiResult<SubjectResponse>.Error("", "Id is null or 0", StatusCodes.Status406NotAcceptable);
+
                 var subject = await _context
                                     .Subjects
                                     .Where(c => c.Id == id)
