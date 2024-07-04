@@ -1,7 +1,9 @@
 ﻿using ExamSystem.Data;
 using ExamSystem.Entities;
 using ExamSystem.Enum;
+using ExamSystem.Results;
 using ExamSystem.Results.Requests;
+using ExamSystem.Results.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExamSystem.Services
@@ -17,104 +19,193 @@ namespace ExamSystem.Services
             _context = context;
         }
 
-        public async Task<string> Login(LoginRequest request)
+        public async Task<ApiResult<UserResponse>> Login(LoginRequest request)
         {
-            if (request.Email == string.Empty || request.Password == string.Empty)
-                return "Email or password is wrong";
+            try
+            {
+                if (String.IsNullOrEmpty(request.Password)
+                           ||
+                           String.IsNullOrEmpty(request.Email))
+                    return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status406NotAcceptable);
 
 
-            var user = await _context.Users.Where(c => c.Email == request.Email)
-                .Include(c => c.UserRole)
-                .FirstAsync();
+                var user = await _context.Users.Where(c => c.Email == request.Email)
+                    .Include(c => c.UserRole)
+                    .FirstAsync();
 
-            if (user is null)
-                return "No such User Exists";
+                if (user is null)
+                    return ApiResult<UserResponse>.Error("", "No such User exists", StatusCodes.Status406NotAcceptable);
 
-            var validatePass = user.VerifyPassword(request.Password);
 
-            if (validatePass is false)
-                return "Password is wrong";
+                var validatePass = user.VerifyPassword(request.Password);
 
-            var token = _authService.GenerateToken(user);
+                if (validatePass is false)
+                    return ApiResult<UserResponse>.Error("", "Password is wrong", StatusCodes.Status406NotAcceptable);
 
-            return token;
+                var token = _authService.GenerateToken(user);
+
+                var response = new UserResponse
+                {
+                    Email = request.Email,
+                    Token = token
+                };
+
+                return ApiResult<UserResponse>.Ok(response);
+            }
+            catch (Exception)
+            {
+                return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
         }
-        public async Task<User> TeacherRegister(RegisterRequest request)
+        public async Task<ApiResult<UserResponse>> TeacherRegister(RegisterRequest request)
         {
-            var newUser = new User
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                Name = request.Name,
-                Email = request.Email,
-                UserRoleId = (int)UserRoleEnum.Teacher,
-                isActive = true,
-                EditDate = DateTime.Now,
-                CreateDate = DateTime.Now
+                if (String.IsNullOrEmpty(request.Name)
+                       ||
+                       String.IsNullOrEmpty(request.Password)
+                       ||
+                       String.IsNullOrEmpty(request.Email))
+                    return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status406NotAcceptable);
+                var newUser = new User
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    UserRoleId = (int)UserRoleEnum.Teacher,
+                    isActive = true,
+                    EditDate = DateTime.Now,
+                    CreateDate = DateTime.Now
 
-            };
+                };
 
-            newUser.CreatePassword(request.Password);
+                newUser.CreatePassword(request.Password);
 
-            await _context.Users.AddAsync(newUser);
+                await _context.Users.AddAsync(newUser);
+                await transaction.CommitAsync();
 
-            await _context.SaveChangesAsync();
-            return newUser;
+                await _context.SaveChangesAsync();
+
+                var response = new UserResponse
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+
+                };
+                return ApiResult<UserResponse>.Ok(response);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
         }
-        public async Task<User> AdminRegister(RegisterRequest request)
+        public async Task<ApiResult<UserResponse>> AdminRegister(RegisterRequest request)
         {
-            var newUser = new User
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Name = request.Name,
-                Email = request.Email,
-                UserRoleId = (int)UserRoleEnum.Admin,
-                isActive = true,
-                EditDate = DateTime.Now,
-                CreateDate = DateTime.Now
+                if (String.IsNullOrEmpty(request.Name)
+                    ||
+                    String.IsNullOrEmpty(request.Password)
+                    ||
+                    String.IsNullOrEmpty(request.Email))
+                    return ApiResult<UserResponse>.Error("", "", StatusCodes.Status406NotAcceptable);
 
-            };
+                var newUser = new User
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    UserRoleId = (int)UserRoleEnum.Admin,
+                    isActive = true,
+                    EditDate = DateTime.Now,
+                    CreateDate = DateTime.Now
 
-            newUser.CreatePassword(request.Password);
+                };
 
-            await _context.Users.AddAsync(newUser);
+                newUser.CreatePassword(request.Password);
 
-            await _context.SaveChangesAsync();
-            return newUser;
+                await _context.Users.AddAsync(newUser);
+                await transaction.CommitAsync();
+                await _context.SaveChangesAsync();
+                var response = new UserResponse
+                {
+                    Name = request.Name,
+                    Email = request.Email
+                };
+
+
+                return ApiResult<UserResponse>.Ok(response);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
         }
-        public async Task<User> StudentRegister(RegisterRequest request)
+        public async Task<ApiResult<UserResponse>> StudentRegister(RegisterRequest request)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var newUser = new User
+            try
             {
-                Name = request.Name,
-                Email = request.Email,
-                UserRoleId = (int)UserRoleEnum.Student,
-                isActive = true,
-                EditDate = DateTime.Now,
-                CreateDate = DateTime.Now,
-                
+                if (String.IsNullOrEmpty(request.Name)
+                   ||
+                   String.IsNullOrEmpty(request.Password)
+                   ||
+                   String.IsNullOrEmpty(request.Email))
+                    return ApiResult<UserResponse>.Error("", "", StatusCodes.Status406NotAcceptable);
 
-            };
-            var newStudent = new Student
+                var newUser = new User
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    UserRoleId = (int)UserRoleEnum.Student,
+                    isActive = true,
+                    EditDate = DateTime.Now,
+                    CreateDate = DateTime.Now
+                };
+
+
+
+                var newStudent = new Student
+                {
+                    CreateDate = DateTime.Now,
+                    EditDate = DateTime.Now,
+                    Email = request.Email,
+                    Name = request.Name,
+                    UserRoleId = (int)UserRoleEnum.Student
+
+                };
+
+                newUser.CreatePassword(request.Password);
+                newStudent.Password = newUser.Password;
+
+
+                await _context.Users.AddAsync(newUser);
+                await _context.Students.AddAsync(newStudent);
+                await transaction.CommitAsync();
+
+                await _context.SaveChangesAsync();
+
+                var response = new UserResponse
+                {
+                    Name = request.Name,
+                    Email = request.Email
+                };
+                return ApiResult<UserResponse>.Ok(response);
+
+            }
+            catch (Exception)
             {
-                CreateDate = DateTime.Now,
-                EditDate =  DateTime.Now,
-                Email = request.Email,
-                Name = request.Name,
-                UserRoleId= (int)UserRoleEnum.Student
-
-            };
-
-            newUser.CreatePassword(request.Password);
-            newStudent.Password = newUser.Password;
+                await transaction.RollbackAsync();
+                return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
+            }
 
 
-            await _context.Users.AddAsync(newUser);
-            await _context.Students.AddAsync(newStudent);
-
-            await _context.SaveChangesAsync();
-            return newUser;
         }
+
 
     }
-
-
 }

@@ -1,13 +1,15 @@
 ﻿using ExamSystem.Entities;
+using ExamSystem.Results;
 using ExamSystem.Results.Requests;
+using ExamSystem.Results.Responses;
 
 namespace ExamSystem.Services
 {
     public interface IAccountService
     {
-        public Task<User> AdminRegister(RegisterRequest request);
-        public Task<User> TeacherRegister(RegisterRequest request);
-        public Task<User> StudentRegister(RegisterRequest request);
-        public Task<string> Login(LoginRequest request);
+        public Task<ApiResult<UserResponse>> AdminRegister(RegisterRequest request);
+        public Task<ApiResult<UserResponse>> TeacherRegister(RegisterRequest request);
+        public Task<ApiResult<UserResponse>> StudentRegister(RegisterRequest request);
+        public Task<ApiResult<UserResponse>> Login(LoginRequest request);
     }
 }
