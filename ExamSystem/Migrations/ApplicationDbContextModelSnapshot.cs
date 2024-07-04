@@ -107,7 +107,7 @@ namespace ExamSystem.Migrations
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ExamId")
+                    b.Property<int>("ExamId")
                         .HasColumnType("int");
 
                     b.Property<int>("StudentId")
@@ -311,15 +311,19 @@ namespace ExamSystem.Migrations
 
             modelBuilder.Entity("ExamSystem.Entities.Mark", b =>
                 {
-                    b.HasOne("ExamSystem.Entities.Exam", null)
+                    b.HasOne("ExamSystem.Entities.Exam", "Exam")
                         .WithMany("Marks")
-                        .HasForeignKey("ExamId");
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ExamSystem.Entities.Student", "Student")
                         .WithMany("Marks")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Exam");
 
                     b.Navigation("Student");
                 });

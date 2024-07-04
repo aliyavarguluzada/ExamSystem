@@ -23,7 +23,7 @@ namespace ExamSystem.Controllers
         [HttpGet("all"), Authorize(Roles = "Admin")]
         public async Task<List<UserDto>> GetAllUsers([FromQuery] PaginationModel model) => await _userService.GetAllUsers(model);
 
-        [HttpPost("addRole"), Authorize(Roles = "Admin")]
+        [HttpPost("addRole")]
         public async Task<ApiResult<UserResponse>> AddUserRole([FromBody] string name) => await _userService.AddUserRole(name);
 
         [HttpPut("update"), Authorize(Roles = "Admin")]

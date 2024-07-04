@@ -1,8 +1,8 @@
-﻿using ExamSystem.Results;
+﻿using ExamSystem.Dtos;
+using ExamSystem.Results;
 using ExamSystem.Results.Requests;
 using ExamSystem.Results.Responses;
 using ExamSystem.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamSystem.Controllers
@@ -20,5 +20,8 @@ namespace ExamSystem.Controllers
 
         [HttpPost("add")]
         public async Task<ApiResult<MarkResponse>> Add(MarkRequest request) => await _markService.Add(request);
+
+        [HttpGet("all")]
+        public async Task<List<MarkDto>> GetMarksAsync() => await _markService.GetAllMarks();
     }
 }

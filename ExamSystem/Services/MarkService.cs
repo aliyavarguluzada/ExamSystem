@@ -1,8 +1,10 @@
 ﻿using ExamSystem.Data;
+using ExamSystem.Dtos;
 using ExamSystem.Entities;
 using ExamSystem.Results;
 using ExamSystem.Results.Requests;
 using ExamSystem.Results.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExamSystem.Services
 {
@@ -22,7 +24,8 @@ namespace ExamSystem.Services
                 Value = request.Mark,
                 CreateDate = DateTime.Now,
                 EditDate = DateTime.Now,
-                StudentId = request.StudentId
+                StudentId = request.StudentId,
+                ExamId = request.ExamId
             };
 
             await _context.AddAsync(newMark);
@@ -39,6 +42,24 @@ namespace ExamSystem.Services
 
         }
 
-        
+        public async Task<List<MarkDto>> GetAllMarks()
+        {
+            var marks = await _context
+                              .Marks
+                              .Include(c => c.Student)
+                              .Include(c => c.Exam)
+                              .Select(c => new MarkDto
+                              {
+                                  Mark = c.Value,
+                                  StudentEmail = c.Student.Email,
+                                  StudentName = c.Student.Name,
+                                  ExamName = c.Exam.Name
+                              })
+                              .ToListAsync();
+            return marks;
+
+        }
+
+
     }
 }
