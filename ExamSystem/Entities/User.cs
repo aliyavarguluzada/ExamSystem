@@ -7,8 +7,7 @@
         public string Email { get; set; }
         public string Password { get; set; }
         public bool isActive { get; set; }
-        public int UserRoleId { get; set; }
-        public UserRole UserRole { get; set; }
+        public List<UserRole> UserRoles { get; set; }
 
         public string CreatePassword(string password)
         {

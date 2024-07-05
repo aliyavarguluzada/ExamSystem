@@ -26,8 +26,6 @@ namespace ExamSystem.Services
                               {
                                   Email = c.Email,
                                   Name = c.Name,
-                                  Password = c.Password,
-                                  UserRole = c.UserRole.Name
                               })
                               .Skip((model.PageNumber - 1) * model.PageSize)
                               .Take(model.PageSize)
@@ -42,7 +40,7 @@ namespace ExamSystem.Services
         {
             var user = await _context
                              .Users
-                             .Include(c => c.UserRole)
+                             //.Include(c => c.UserRole)
                              .Where(c => c.Id == id)
                              .FirstAsync();
 
@@ -88,7 +86,6 @@ namespace ExamSystem.Services
             {
                 CreateDate = DateTime.Now,
                 EditDate = DateTime.Now,
-                Name = name
             };
 
             await _context.AddAsync(newRole);

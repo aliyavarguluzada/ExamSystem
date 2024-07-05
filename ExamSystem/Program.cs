@@ -55,8 +55,13 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
-builder.Services.AddScoped<IMarkService, MarkService>();
 
+builder.Services.AddScoped<IMarkService, MarkService>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireRole("Admin"));
+});
 
 var app = builder.Build();
 

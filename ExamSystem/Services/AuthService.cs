@@ -19,6 +19,11 @@ namespace ExamSystem.Services
             var audience = _configuration["JWTSettings:Audience"];
             var key = Encoding.UTF8.GetBytes(_configuration["JWTSettings:Key"]);
 
+            string role = user.UserRoles.Where(c => c.UserId == user.Id).First().User.Name;
+
+
+            //List<Claim> roles = user.UserRoles.Select(r => new Claim(ClaimTypes.Role, r.Role.Name)).ToList();
+
             var tokendescriptor = new SecurityTokenDescriptor
             {
                 Subject = new System.Security.Claims.ClaimsIdentity(new[]
@@ -26,7 +31,7 @@ namespace ExamSystem.Services
                     new Claim("id", user.Id.ToString()),
                     new Claim("email", user.Email),
                     new Claim("jti", Guid.NewGuid().ToString().Replace("-","")),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.UserRole.Name)
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
 
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JWTSettings:Expiration"])),
@@ -37,6 +42,8 @@ namespace ExamSystem.Services
                 SecurityAlgorithms.HmacSha512Signature)
 
             };
+            //tokendescriptor.Subject.AddClaims(roles);
+
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokendescriptor);

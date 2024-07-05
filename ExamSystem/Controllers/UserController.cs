@@ -20,16 +20,16 @@ namespace ExamSystem.Controllers
             _userService = userService;
         }
 
-        [HttpGet("all"), Authorize(Roles = "Admin")]
+        [HttpGet("all"), Authorize(Roles = "admin")]
         public async Task<List<UserDto>> GetAllUsers([FromQuery] PaginationModel model) => await _userService.GetAllUsers(model);
 
         [HttpPost("addRole")]
         public async Task<ApiResult<UserResponse>> AddUserRole([FromBody] string name) => await _userService.AddUserRole(name);
 
-        [HttpPut("update/{id}"), Authorize(Roles = "Admin")]
+        [HttpPut("update/{id}"), Authorize(Roles = "admin")]
         public async Task<ApiResult<UpdateResponse>> Update([FromRoute] int id, [FromBody] UpdateRequest request) => await _userService.Update(id, request);
 
-        [HttpPut("deactivate"), Authorize(Roles = "Admin")]
+        [HttpPut("deactivate"), Authorize(Roles = "admin")]
         public async Task<ApiResult<UserResponse>> Deactive([FromBody] int id) => await _userService.Deactive(id);
 
 

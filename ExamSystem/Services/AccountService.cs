@@ -1,6 +1,4 @@
 ﻿using ExamSystem.Data;
-using ExamSystem.Entities;
-using ExamSystem.Enum;
 using ExamSystem.Results;
 using ExamSystem.Results.Requests;
 using ExamSystem.Results.Responses;
@@ -30,17 +28,17 @@ namespace ExamSystem.Services
 
 
                 var user = await _context.Users.Where(c => c.Email == request.Email)
-                    .Include(c => c.UserRole)
+                    .Include(c => c.UserRoles)
                     .FirstAsync();
 
                 if (user is null)
                     return ApiResult<UserResponse>.Error("", "No such User exists", StatusCodes.Status406NotAcceptable);
 
 
-                var validatePass = user.VerifyPassword(request.Password);
+                //var validatePass = user.VerifyPassword(request.Password);
 
-                if (validatePass is false)
-                    return ApiResult<UserResponse>.Error("", "Password is wrong", StatusCodes.Status406NotAcceptable);
+                //if (validatePass is false)
+                //    return ApiResult<UserResponse>.Error("", "Password is wrong", StatusCodes.Status406NotAcceptable);
 
                 var token = _authService.GenerateToken(user);
 
@@ -57,7 +55,7 @@ namespace ExamSystem.Services
                 return ApiResult<UserResponse>.Error("", "Error", StatusCodes.Status400BadRequest);
             }
         }
-        
+
 
 
     }
